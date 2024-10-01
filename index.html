@@ -28,12 +28,25 @@
     <script>
         document.getElementById('smsForm').addEventListener('submit', function(event) {
             event.preventDefault();
+            
+            // Obtener el valor del textarea
             const smsMessage = document.getElementById('smsMessage').value;
+            
+            // Verificar si el mensaje no está vacío
+            if (!smsMessage) {
+                alert("El campo de mensaje no puede estar vacío.");
+                return;
+            }
+
+            // Mostrar el valor capturado en la consola (para depuración)
+            console.log("Mensaje enviado: ", smsMessage);
 
             // Crear objeto JSON con el mensaje
             const data = {
                 mensaje: smsMessage
             };
+
+            console.log("Payload enviado:", data); // Verificar si el mensaje está correctamente estructurado
 
             // Enviar la solicitud POST a la API
             fetch('https://smishguard-api-gateway.onrender.com/consultar-modelo', {
@@ -41,14 +54,17 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(data)  // Convertir el objeto 'data' a una cadena JSON
             })
             .then(response => response.json())
             .then(result => {
+                // Verificar que la API devuelve los datos esperados
+                console.log("Respuesta del servidor:", result);
+
                 // Mostrar los resultados en el HTML
-                document.getElementById('analisis_microservicio').textContent = "Análisis Microservicio: " + result.analisis_microservicio.prediction;
-                document.getElementById('analisis_microservicio_vt').textContent = "Análisis Microservicio VT: " + (result.analisis_microservicio_vt.Error || result.analisis_microservicio_vt.prediction);
-                document.getElementById('analisis_openai').textContent = "Análisis OpenAI: " + result.analisis_openai.Descripción;
+                document.getElementById('analisis_microservicio').textContent = "Análisis Microservicio: " + (result.analisis_microservicio.prediction || "Error");
+                document.getElementById('analisis_microservicio_vt').textContent = "Análisis Microservicio VT: " + (result.analisis_microservicio_vt.Error || "Error");
+                document.getElementById('analisis_openai').textContent = "Análisis OpenAI: " + (result.analisis_openai.Descripción || "Error");
 
                 // Mostrar el resultado y ocultar el formulario
                 document.getElementById('smsForm').style.display = 'none';
