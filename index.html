@@ -37,17 +37,17 @@
                 alert("El campo de mensaje no puede estar vacío.");
                 return;
             }
-
+    
             // Mostrar el valor capturado en la consola (para depuración)
             console.log("Mensaje enviado: ", smsMessage);
-
+    
             // Crear objeto JSON con el mensaje
             const data = {
                 mensaje: smsMessage
             };
-
+    
             console.log("Payload enviado:", data); // Verificar si el mensaje está correctamente estructurado
-
+    
             // Enviar la solicitud POST a la API
             fetch('https://smishguard-api-gateway.onrender.com/consultar-modelo', {
                 method: 'POST',
@@ -60,12 +60,17 @@
             .then(result => {
                 // Verificar que la API devuelve los datos esperados
                 console.log("Respuesta del servidor:", result);
-
-                // Mostrar los resultados en el HTML
-                document.getElementById('analisis_microservicio').textContent = "Análisis Microservicio: " + (result.analisis_microservicio.prediction || "Error");
-                document.getElementById('analisis_microservicio_vt').textContent = "Análisis Microservicio VT: " + (result.analisis_microservicio_vt.Error || "Error");
-                document.getElementById('analisis_openai').textContent = "Análisis OpenAI: " + (result.analisis_openai.Descripción || "Error");
-
+    
+                // Mostrar los resultados en el HTML con el formato correcto
+                if (result.analisis_microservicio && result.analisis_microservicio.prediction) {
+                    document.getElementById('analisis_microservicio').textContent = "Análisis Modelo de ML: " + result.analisis_microservicio.prediction;
+                } else {
+                    document.getElementById('analisis_microservicio').textContent = "Análisis Microservicio: Sin datos";
+                }
+    
+                document.getElementById('analisis_microservicio_vt').textContent = "Análisis Microservicio VT: " + result.analisis_microservicio_vt.overall_result + " (URL: " + result.analisis_microservicio_vt.url + ")";
+                document.getElementById('analisis_openai').textContent = "Análisis OpenAI: " + result.analisis_openai.Descripción + " (Calificación: " + result.analisis_openai.Calificación + ")";
+    
                 // Mostrar el resultado y ocultar el formulario
                 document.getElementById('smsForm').style.display = 'none';
                 document.getElementById('response').style.display = 'block';
@@ -75,7 +80,7 @@
                 document.getElementById('response').textContent = "Error al consultar el mensaje.";
             });
         });
-
+    
         // Función para volver a enviar otro mensaje (resetea el formulario)
         function resetForm() {
             document.getElementById('smsForm').style.display = 'block';
@@ -83,5 +88,8 @@
             document.getElementById('smsMessage').value = '';
         }
     </script>
+    
+    
+    
 </body>
 </html>
