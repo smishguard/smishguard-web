@@ -20,141 +20,17 @@
 
         <div id="response" style="display: none;">
             <h3>Resultados del análisis:</h3>
-            <p id="analisis_microservicio"></p>
-            <p id="analisis_microservicio_vt"></p>
-            <p id="analisis_openai"></p>
-            <button id="sendWithoutLinkButton" style="display: none;" onclick="sendSmsWithoutLink()">Enviar mensaje sin
-                enlace</button>
+            <p id="analisis_gpt"></p>
+            <p id="analisis_smishguard"></p>
+            <p id="enlace_sospechoso"></p>
+            <p id="mensaje_analizado"></p>
+            <p id="puntaje">Puntaje: <span id="puntaje_valor" class="puntaje"></span></p>
+            <button id="sendWithoutLinkButton" style="display: none;" onclick="sendSmsWithoutLink()">Enviar mensaje sin enlace</button>
             <button id="backButton" onclick="resetForm()">Volver a enviar otro mensaje</button>
         </div>
+
+        <script src="script.js"></script>
     </div>
-
-    <script>
-        document.getElementById('smsForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            // Obtener el valor del textarea
-            const smsMessage = document.getElementById('smsMessage').value;
-
-            // Verificar si el mensaje no está vacío
-            if (!smsMessage) {
-                alert("El campo de mensaje no puede estar vacío.");
-                return;
-            }
-
-            // Mostrar el valor capturado en la consola (para depuración)
-            console.log("Mensaje enviado: ", smsMessage);
-
-            // Crear objeto JSON con el mensaje
-            const data = {
-                mensaje: smsMessage
-            };
-
-            console.log("Payload enviado:", data); // Verificar si el mensaje está correctamente estructurado
-
-            // Enviar la solicitud POST a la API
-            fetch('https://smishguard-api-gateway.onrender.com/consultar-modelo', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)  // Convertir el objeto 'data' a una cadena JSON
-            })
-                .then(response => response.json())
-                .then(result => {
-                    // Verificar que la API devuelve los datos esperados
-                    console.log("Respuesta del servidor:", result);
-
-                    // Verificar y mostrar el resultado de analisis_microservicio
-                    if (result.analisis_microservicio && result.analisis_microservicio.prediction) {
-                        document.getElementById('analisis_microservicio').textContent = "Análisis Microservicio: " + result.analisis_microservicio.prediction;
-                    } else {
-                        document.getElementById('analisis_microservicio').textContent = "Análisis Microservicio: Sin datos";
-                    }
-
-                    // Verificar y mostrar el resultado de analisis_microservicio_vt
-                    if (result.analisis_microservicio_vt && result.analisis_microservicio_vt.overall_result) {
-                        document.getElementById('analisis_microservicio_vt').textContent = "Análisis Microservicio VT: " + result.analisis_microservicio_vt.overall_result +
-                            " (URL: " + (result.analisis_microservicio_vt.url || "Sin URL") + ")";
-                    } else {
-                        document.getElementById('analisis_microservicio_vt').textContent = "Análisis Microservicio VT: Sin datos";
-                    }
-
-                    // Verificar y mostrar el resultado de analisis_openai
-                    if (result.analisis_openai && result.analisis_openai.Descripción) {
-                        document.getElementById('analisis_openai').textContent = "Análisis OpenAI: " + result.analisis_openai.Descripción +
-                            " (Calificación: " + result.analisis_openai.Calificación + ")";
-                    } else {
-                        document.getElementById('analisis_openai').textContent = "Análisis OpenAI: Sin datos";
-                    }
-
-                    // Verificar las condiciones para habilitar el botón
-                    if (
-                        result.analisis_microservicio &&
-                        result.analisis_microservicio.prediction === "spam" &&
-                        result.analisis_microservicio_vt &&
-                        result.analisis_microservicio_vt.overall_result.includes("MALICIOSO") &&
-                        result.analisis_openai &&
-                        result.analisis_openai.Calificación > 0.6
-                    ) {
-                        document.getElementById('sendWithoutLinkButton').style.display = 'block';
-                    }
-
-                    // Mostrar el resultado y ocultar el formulario
-                    document.getElementById('smsForm').style.display = 'none';
-                    document.getElementById('response').style.display = 'block';
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('response').textContent = "Error al consultar el mensaje.";
-                });
-        });
-
-        // Función para enviar el SMS sin el enlace
-        function sendSmsWithoutLink() {
-            const smsMessage = document.getElementById('smsMessage').value;
-
-            // Eliminar enlaces (URL) del mensaje usando una expresión regular
-            const smsWithoutLink = smsMessage.replace(/https?:\/\/[^\s]+/g, '[ENLACE REMOVIDO]');
-
-            // Crear objeto JSON para enviar al servicio de tweet
-            const data = {
-                sms: smsWithoutLink
-            };
-
-            // Enviar la solicitud POST al servicio de tweet
-            fetch('https://smishguard-twitter-ms.onrender.com/tweet', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-                .then(response => response.json())
-                .then(result => {
-                    alert('El mensaje sin enlace ha sido enviado correctamente.');
-                })
-                .catch(error => {
-                    console.error('Error al enviar el mensaje sin enlace:', error);
-                    alert('Error al enviar el mensaje sin enlace.');
-                });
-        }
-
-        // Función para volver a enviar otro mensaje (resetea el formulario)
-        function resetForm() {
-            document.getElementById('smsForm').style.display = 'block';
-            document.getElementById('response').style.display = 'none';
-            document.getElementById('sendWithoutLinkButton').style.display = 'none'; // Ocultar el botón al resetear
-
-            // Reiniciar el contenido de los resultados
-            document.getElementById('analisis_microservicio').textContent = '';
-            document.getElementById('analisis_microservicio_vt').textContent = '';
-            document.getElementById('analisis_openai').textContent = '';
-
-            document.getElementById('smsMessage').value = '';
-        }
-
-    </script>
 </body>
 
 </html>
