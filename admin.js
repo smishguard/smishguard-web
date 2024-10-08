@@ -19,7 +19,7 @@ fetch('https://smishguard-api-gateway.onrender.com/mensajes-reportados')
                     <p><strong>Mensaje:</strong> ${doc.contenido}</p>
                     <p><strong>Análisis GPT:</strong> ${doc.analisis.calificacion_gpt}</p>
                     <p><strong>Puntaje:</strong> ${doc.analisis.ponderado}</p>
-                    <button onclick="publicarMensaje('${doc._id}', '${doc.contenido}')">Publicar</button>
+                    <button onclick="publicarMensaje('${doc._id}', \`${doc.contenido}\`)">Publicar</button>
                     <hr>
                 `;
                 mensajesReportados.appendChild(div);
