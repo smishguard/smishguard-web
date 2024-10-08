@@ -120,7 +120,7 @@ function sendSmsWithoutLink() {
     };
 
     // Enviar la solicitud POST al servicio de tweet
-    fetch('https://smishguard-twitter-ms.onrender.com/tweet', {
+    fetch('https://smishguard-api-gateway.onrender.com/guardar-mensaje-reportado', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
