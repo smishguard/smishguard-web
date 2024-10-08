@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmishGuard - Verificación de SMS</title>
+    <title>SmishGuard - Análisis de SMS</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
     <div class="container">
-        <h1>SmishGuard</h1>
+        <h1>SmishGuard - Análisis de SMS</h1>
         <p>Introduce el mensaje de texto (SMS) para verificar si es una estafa:</p>
 
         <form id="smsForm">
@@ -25,11 +25,11 @@
             <p id="enlace_sospechoso"></p>
             <p id="mensaje_analizado"></p>
             <p id="puntaje">Puntaje: <span id="puntaje_valor" class="puntaje"></span></p>
-            <button id="sendWithoutLinkButton" style="display: none;" onclick="sendSmsWithoutLink()">Enviar mensaje sin enlace</button>
+            <button id="sendReportButton" style="display: none;" onclick="sendReport()">Enviar Reporte</button>
             <button id="backButton" onclick="resetForm()">Volver a enviar otro mensaje</button>
         </div>
 
-        <script src="script.js"></script>
+        <script src="analisis.js"></script>
     </div>
 </body>
 
